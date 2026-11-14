@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# Based on the 'chat_with_pdf' template from Shubhamsaboo/awesome-llm-apps
+# Original repo: https://github.com/Shubhamsaboo/awesome-llm-apps
+
 import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
