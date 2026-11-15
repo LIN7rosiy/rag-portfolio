@@ -5,7 +5,9 @@
 import streamlit as st
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+#from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_openai import ChatOpenAI
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain_classic.chains import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
@@ -51,11 +53,12 @@ if openai_api_key:
                 
                 # 建立向量数据库
                 #embedding = OpenAIEmbeddings()
-                embedding = OpenAIEmbeddings(
-                    api_key=openai_api_key,
-                    base_url="https://api.deepseek.com",
-                    model="deepseek-embedding"
-                )
+                # embedding = OpenAIEmbeddings(
+                #     api_key=openai_api_key,
+                #     base_url="https://api.deepseek.com",
+                #     model="deepseek-embedding"
+                # )
+                embedding = HuggingFaceEmbeddings(model_name="BAAI/bge-small-zh-v1.5")
                 st.session_state.vectorstore = Chroma.from_documents(documents=splits, embedding=embedding)
             st.success("知识库构建完成！")
         
