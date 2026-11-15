@@ -7,8 +7,8 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_chroma import Chroma
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_classic.chains import create_retrieval_chain
+from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 import tempfile
 import os
@@ -31,7 +31,7 @@ if "chat_history" not in st.session_state:
 
 # 处理 PDF 上传与向量化
 if openai_api_key:
-    os.environ["OPENAI_API_KEY"] = openai_api_key
+    #os.environ["OPENAI_API_KEY"] = openai_api_key
     
     uploaded_file = st.file_uploader("请上传一个 PDF 文件", type="pdf")
     
@@ -50,7 +50,12 @@ if openai_api_key:
                 splits = text_splitter.split_documents(docs)
                 
                 # 建立向量数据库
-                embedding = OpenAIEmbeddings()
+                #embedding = OpenAIEmbeddings()
+                embedding = OpenAIEmbeddings(
+                    api_key=openai_api_key,
+                    base_url="https://api.deepseek.com",
+                    model="deepseek-embedding"
+                )
                 st.session_state.vectorstore = Chroma.from_documents(documents=splits, embedding=embedding)
             st.success("知识库构建完成！")
         
@@ -61,7 +66,14 @@ if openai_api_key:
             st.session_state.chat_history.append({"role": "user", "content": user_query})
             
             with st.spinner("AI 正在思考..."):
-                llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+                #llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+                llm = ChatOpenAI(
+                    api_key=openai_api_key,
+                    base_url="https://api.deepseek.com",
+                    model="deepseek-chat", # 注意这里用官方标准的 deepseek-chat
+                    temperature=0
+                )
+
                 retriever = st.session_state.vectorstore.as_retriever()
                 
                 system_prompt = (
